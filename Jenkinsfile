@@ -41,6 +41,15 @@ pipeline {
                 '''
             }
         }
+
+        stage('Deploy'){
+            steps {
+                sh '''
+                    npm install netlify-cli@26.1.0
+                    node_modules/.bin/netlify --version
+                '''
+            }
+        }
     }
 
     post {
