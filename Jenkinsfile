@@ -41,6 +41,7 @@ pipeline {
                 docker { 
                     image 'mcr.microsoft.com/playwright:v1.39.0-jammy' 
                     reuseNode true
+                    args "-u root --entrypoint='' -v /var/run/docker.sock:/var/run/docker.sock"
                 }
             }
             steps {
@@ -54,6 +55,24 @@ pipeline {
             }
         }
 
+        stage('Build Docker Image'){
+             agent {
+                docker { 
+                    image 'amazon/aws-cli'
+                    reuseNode true
+                    args "-u root --entrypoint=''" 
+                }
+            }
+
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'my-aws', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
+                    sh '''
+                        yum install -y docker
+                        docker build -t myjenkinsapp .
+                    '''
+                }
+            }
+        }
        
     }
   
